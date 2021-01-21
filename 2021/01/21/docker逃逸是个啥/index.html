@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>docker逃逸是个啥 | Yum~Yum~Yummyl~</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Yum~Yum~Yummyl~</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-docker逃逸是个啥" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      docker逃逸是个啥
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:05:06.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <pre><code>Docker是当今使用范围最广的开源容器技术之一，具有高效易用的优点。docker可以让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中，然后发布到任何流行的 Linux或Windows 机器上，也可以实现虚拟化。</code></pre>
+<h1 id="什么是docker逃逸"><a href="#什么是docker逃逸" class="headerlink" title="什么是docker逃逸"></a>什么是docker逃逸</h1><p>docker都是部署在直接宿主机上的，如果攻击者获取了docker业务的某种权限，那么通过某种方式来获取直接宿主机的某种权限下的执行命令能力就叫做docker逃逸。也就是从docker这个牢笼中“逃”出来抵达宿主机的方式。</p>
+<h1 id="docker逃逸类型"><a href="#docker逃逸类型" class="headerlink" title="docker逃逸类型"></a>docker逃逸类型</h1><p>目前的 Docker 逃逸的类型大体可以划分为三种：</p>
+<ul>
+<li>由内核漏洞引起 ——Dirty COW(CVE-2016-5195)（脏牛漏洞）</li>
+<li>由 Docker 软件设计引起——CVE-2019-5736、CVE-2019-14271</li>
+<li>由配置不当引起——开启privileged（特权模式）+宿主机目录挂载（文件挂载）、功能（capabilities）机制、sock通信方式</li>
+</ul>
+<h1 id="docker逃逸原理"><a href="#docker逃逸原理" class="headerlink" title="docker逃逸原理"></a>docker逃逸原理</h1><h1 id="docker环境判断"><a href="#docker环境判断" class="headerlink" title="docker环境判断"></a>docker环境判断</h1><p>可以使用metasploit中的checkcontainer或checkvm模块来检测，检测原理也很简单：</p>
+<ol>
+<li>检查/.dockerenv文件是否存在；</li>
+<li>检查/proc/1/cgroup内是否包含”docker”等字符串；</li>
+<li>检查是否存在container环境变量。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <span id="article-nav-newer" class="article-nav-link-wrap newer"></span>
+  
+  
+    <a href="/2021/01/21/%E7%BC%96%E7%A0%81%E7%9A%84%E7%BA%B7%E7%BA%B7%E6%89%B0%E6%89%B0/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          编码的纷纷扰扰
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+
+</body>
+</html>

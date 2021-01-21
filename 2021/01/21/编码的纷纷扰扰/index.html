@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>编码的纷纷扰扰 | Yum~Yum~Yummyl~</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Yum~Yum~Yummyl~</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-编码的纷纷扰扰" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      编码的纷纷扰扰
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:04:35.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h1 id="教你如何一眼看懂编码"><a href="#教你如何一眼看懂编码" class="headerlink" title="教你如何一眼看懂编码"></a>教你如何一眼看懂编码</h1><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>先说结论，具体区别在后面，<strong>注意，由于并不能从文本信息上查看其编码方式，该方法仅可做大致快速判断，并非绝对正确</strong>；<br>遇到编码问题，可以大致按以下步骤判断：</p>
+<ol>
+<li>有没有“%”百分号，有百分号则为URL编码或base16，如果待测文本不是url就先试一试hex，这里对hex解码时要注意选对编码集（如gb2312或utf-8）；</li>
+<li>有没有“=”等号,有等号则为baseXX（如base64，base32，base58）；</li>
+<li>有没有“&amp;#”取地址符和井号或“&amp;#x”或“\U”或“\U+”，有这样的组合则为Unicode编码；</li>
+<li>如果是“\u”的情况，则为Ascii码；</li>
+<li>根据文件头判断，但也不一定准确<br> EF BB BF　　　 UTF-8<br> FE FF　　　　　UTF-16/UCS-2, 小头存储<br> FF FE　　　　　UTF-16/UCS-2, 大头存储<br> FF FE 00 00　　UTF-32/UCS-4, 小头存储<br> 00 00 FE FF　　UTF-32/UCS-4, 大头存储</li>
+<li>针对文件编码方式，可以用记事本打开，直接编码方式；</li>
+</ol>
+<h2 id="Base64编码特征"><a href="#Base64编码特征" class="headerlink" title="Base64编码特征"></a>Base64编码特征</h2><ul>
+<li>base32的编码表是由（A-Z、2-7）32个可见字符构成，“=”符号用作后缀填充；</li>
+<li>base64的编码表是由（A-Z、a-z、0-9、+、/）64个可见字符构成，“=”符号用作后缀填充；</li>
+<li>base58的编码表相比base64少了数字0，大写字母I，O，小写字母 l (这个是L），以及符号‘+’和‘/’；</li>
+<li>base16就是Hex编码，由16个ASCII可打印字符构成（数字0-9和字母A-F），base16不可能出现“=”；</li>
+</ul>
+<p><strong>举个例子</strong>：<br>base32 原文1234567 =&gt; 密文GEZDGNBVGY3Q====<br>特征：大写字母和数字，不满5的倍数，用‘=’补齐。<br>base64 原文1234567 =&gt; 密文MTIzNDU2Nw==<br>特征：大小写字母和数字，不满3的倍数，用‘=’补齐。<br>base58 原文1234567 =&gt; 密文2s8YYFs4Vc</p>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>经过GB2312编码后：%d5%e2%ca%c7%b2%e2%ca%d4%d3%ef%be%e4%a3%ac%54%68%69%73%20%69%73%20%61%20%65%78%61%6d%70%6c%65%20%2c%20%31%32%33%34%35%36%37%21</p>
+<h2 id="Ascii码特征"><a href="#Ascii码特征" class="headerlink" title="Ascii码特征"></a>Ascii码特征</h2><ul>
+<li>用1个字节的8位数来编码英文字符集，即所有字母数字等英文符号可以用二进制数、十进制、十六进制来表示。比如大写字母A可分别用二进制数（01000001）、十进制（65）、十六进制（0x41）来表示。</li>
+</ul>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：\u8fd9\u662f\u6d4b\u8bd5\u8bed\u53e5\uff0c\u0054\u0068\u0069\u0073\u0020\u0069\u0073\u0020\u0061\u0020\u0065\u0078\u0061\u006d\u0070\u006c\u0065\u0020\u002c\u0020\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0021</p>
+<h2 id="URL编码特征"><a href="#URL编码特征" class="headerlink" title="URL编码特征"></a>URL编码特征</h2><ul>
+<li>一个字符ascii码的十六进制，然后在前面加上% </li>
+</ul>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：%e8%bf%99%e6%98%af%e6%b5%8b%e8%af%95%e8%af%ad%e5%8f%a5%ef%bc%8cThis+is+a+example+%2c+1234567!</p>
+<h2 id="GBK-GBK2312编码特征"><a href="#GBK-GBK2312编码特征" class="headerlink" title="GBK/GBK2312编码特征"></a>GBK/GBK2312编码特征</h2><ul>
+<li>用2个字节16比特的16进制数表示来编码中文字符集，其中GBK是GBK2312的扩展字符集编码，包含简体、繁体中文、日语、韩语等。基于汉字的宽字节注入就是搞使用这种编码的机器。</li>
+</ul>
+<h2 id="Unicode编码特征"><a href="#Unicode编码特征" class="headerlink" title="Unicode编码特征"></a>Unicode编码特征</h2><ul>
+<li>国际标准字符，将全球的各种语言的每个字符定义一个唯一的编码，以满足跨语言、跨平台文本信息的转换，当编码和解码的字符集出现不一致的时候就会出现乱码。 </li>
+<li>UTF-8/16/16LE等等都是Unicode的一种实现，Unicode只规定了编码集，</li>
+</ul>
+<p>类似这种形式：<br>&amp;#x [Hex]: &#x0054;&#x0068;&#x0065;<br>&amp;# [Decimal]: &#00084;&#00104;&#00101;<br>\U [Hex]: \U0054\U0068\U0065<br>\U+ [Hex]: \U+0054\U+0068\U+0065 </p>
+<p>UTF-8是Unicode的一种实现，他的出现统一了Unicode编码集对二进制的表示，也就是告诉机器怎么区分三个字节分别代表三个字符，还是三个字节代表一个字符。</p>
+<p>这里先说一下UTF-8的编码规则：<br>UTF-8 的编码规则很简单，只有二条：<br>1）对于单字节的符号，字节的第一位设为0，后面7位为这个符号的 Unicode 码。因此对于英语字母，UTF-8 编码和 ASCII 码是相同的。<br>2）对于n字节的符号（n &gt; 1），第一个字节的前n位都设为1，第n + 1位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的 Unicode 码。</p>
+<p>比如汉字“严”的 Unicode 是4E25（100111000100101），根据上表，可以发现4E25处在第三行的范围内（0000 0800 - 0000 FFFF），因此严的 UTF-8 编码需要三个字节，即格式是1110xxxx 10xxxxxx 10xxxxxx。然后，从严的最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0。这样就得到了，严的 UTF-8 编码是11100100 10111000 10100101，转换成十六进制就是E4B8A5。</p>
+<p><strong>举个例子</strong>：<br>编码前：这是测试语句，This is a example , 1234567!<br>编码后：&#x8FD9;&#x662F;&#x6D4B;&#x8BD5;&#x8BED;&#x53E5;&#xFF0C;This is a example , 1234567!</p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p>CTF必备技能之编码大全（涉及了CTF混淆相关技术）：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1419464">https://cloud.tencent.com/developer/article/1419464</a><br>Unicode和UTF-8的关系：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tsingke/p/10853936.html">https://www.cnblogs.com/tsingke/p/10853936.html</a></p>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2021/01/21/docker%E9%80%83%E9%80%B8%E6%98%AF%E4%B8%AA%E5%95%A5/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          docker逃逸是个啥
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/01/21/%E8%AF%B4%E8%B5%B7%E5%90%84%E7%A7%8D%E6%B3%A8%E5%85%A5%E7%9A%84%E5%A7%BF%E5%8A%BF%E8%BF%99%E4%BB%B6%E4%BA%8B/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          说起各种注入的姿势这件事
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+
+</body>
+</html>

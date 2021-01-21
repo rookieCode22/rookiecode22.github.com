@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>浅谈溯源 | Yum~Yum~Yummyl~</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Yum~Yum~Yummyl~</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-浅谈溯源" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      浅谈溯源
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time class="article-date" datetime="2021-01-21T15:03:53.000Z" itemprop="datePublished">2021-01-21</time>
+
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h1 id="攻击溯源大法"><a href="#攻击溯源大法" class="headerlink" title="攻击溯源大法"></a>攻击溯源大法</h1><h2 id="攻击溯源思路"><a href="#攻击溯源思路" class="headerlink" title="攻击溯源思路"></a>攻击溯源思路</h2><pre><code>知己——常见系统、服务漏洞分类</code></pre>
+<p>如果是在客户现场常驻的情况，需要了解客户网络架构、运行业务、运行设备等，由这三个方面可以大致得知经常出现的、容易被利用的漏洞。如果是临时现场处置，具体需要注意以下几点：攻击发生时间、攻击持续时间、异常机的主要业务情况、异常机所处网络位置、异常机是否连接公网、开放端口、最近是否做过变更、是否做过升级等。根据所获得的情报做出猜想，这里要求对常见漏洞较为熟悉。按上述思想具体举例，比如一个web服务器公网可以访问出现了被挂黑链的事件使用了s2框架，那么初步可以怀疑是s2-045 s2-046之类的命令执行漏洞了；如果一台公网服务器没有安装补丁又没有防火墙防护，administrator的密码为P@sswrod那么有很大的可能性是被暴力破解成功；</p>
+<pre><code>知彼——日志分析取证</code></pre>
+<p>有了猜想就要取证了。根据现场情报、设备日志等对入侵行为做取证，来验证之前的猜想。我们需要知道入侵者去过哪儿、怎么进来的等等，这首先就需要我们知道常见的设备、服务的默认日志存储位置了。拿到了日志，接下来会详细说一说日志分析的东西，日志角度的攻与防也是很好玩滴。</p>
+<pre><code>反攻——吹响反攻的号角</code></pre>
+<p>找到了入侵者的尾巴就要继续乘胜追击，把他薅出来为止。因为在攻防演练中，蓝队可以追查到攻击者个人信息即算是反攻成功得分，所以这一部分会涉及到社工手段。</p>
+<h2 id="常见系统、服务漏洞快查手册"><a href="#常见系统、服务漏洞快查手册" class="headerlink" title="常见系统、服务漏洞快查手册"></a>常见系统、服务漏洞快查手册</h2><h3 id="Linux常见漏洞"><a href="#Linux常见漏洞" class="headerlink" title="Linux常见漏洞"></a>Linux常见漏洞</h3><h4 id="获取权限类"><a href="#获取权限类" class="headerlink" title="获取权限类"></a>获取权限类</h4><ul>
+<li><p><strong>EXP盲打</strong><br>根据现有的EXP可以直接操作的，大多数攻击都是这样利用现有工具进行的；具体可以查阅<a target="_blank" rel="noopener" href="https://github.com/SecWiki/linux-kernel-exploits">github库</a>，针对这个库的具体信息可以参考”linux系统内核漏洞利用详解.md”。</p>
+</li>
+<li><p><strong>明文root密码权限</strong><br>大多数linux系统的密码都和/etc/passwd和/etc/shadow这两个配置文件息息相关。passwd里面储存了用户，shadow里面是密码的hash。出于安全考虑passwd是全用户可读，root可写的。shadow是仅root可读写的。<br>__passwd文件__内的内容格式如下：root:x:0:0:root:/root:/bin/bash，其含义分别为用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell。其中第二个标签口令要说一点，真正的加密后的用户口令字存放到 /etc/shadow 文件中，而在 /etc/passwd 文件的口令字段中只存放一个特殊的字符，例如“x”或者星号。如果passwd可写，我们就可以把root的密码字段(x)替换成一个已知密码的hash（比如本机shadow里面的root密码hash），这样系统在验证密码时以passwd的为准，密码就已知了。__shadow文件__同理，结构如下：用户名：加密密码：最后一次修改时间：最小修改时间间隔：密码有效期：密码需要变更前的警告天数：密码过期后的宽限时间：账号失效时间：保留字段；如果shadow可读，我们可以读走root的hash，然后用hashcat或者john暴力破解之。由上，<strong>在溯源时，我们可以查看入侵者的是否读取过这两个文件，或对这两个文件进行更改。</strong></p>
+</li>
+<li><p><strong>密码</strong><br>很多管理员会使用弱密码或重复使用密码，因此数据库或者web后台的密码也许就是root密码。在溯源时，<strong>要确定密码是否为上述情况。</strong></p>
+</li>
+</ul>
+<h4 id="提高权限类"><a href="#提高权限类" class="headerlink" title="提高权限类"></a>提高权限类</h4><ul>
+<li><p>SUDO提权<br>有了（疑似）root密码一定会想ssh登陆。然而ssh很可能禁止root登陆，或是防火墙规则将你排除在外了。返回来想，我们不是有一个低权shell了吗？找个办法再上面“输入”密码就好了。显然，直接在低权shell里面用sudo是不奏效的。这是因为出于安全考虑，linux要求用户必须从终端设备（tty）中输入密码，而不是标准输入（stdin）。换句话说，sudo在你输入密码的时候本质上是读取了键盘，而不是bash里面输入的字符。因此为了能够输入密码，我们必须模拟一个终端设备。python就有这样的功能。在shell里面输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#x27;import pty;pty.spawn(&quot;/bin/sh&quot;)&#x27;</span><br></pre></td></tr></table></figure>
+<p>之后输入密码就可以了。</p>
+</li>
+<li><p>计划任务<br>系统内可能会有一些定时执行的任务，一般这些任务由crontab来管理，具有所属用户的权限。非root权限的用户是不可以列出root用户的计划任务的。但是/etc/内系统的计划任务可以被列出</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -l /etc/cron*</span><br></pre></td></tr></table></figure>
+<h3 id="Windows常见漏洞"><a href="#Windows常见漏洞" class="headerlink" title="Windows常见漏洞"></a>Windows常见漏洞</h3></li>
+</ul>
+<h3 id="Web服务常见漏洞"><a href="#Web服务常见漏洞" class="headerlink" title="Web服务常见漏洞"></a>Web服务常见漏洞</h3><h3 id="第三方软件常见漏洞"><a href="#第三方软件常见漏洞" class="headerlink" title="第三方软件常见漏洞"></a>第三方软件常见漏洞</h3><h2 id="常见系统、软件日志默认存放位置"><a href="#常见系统、软件日志默认存放位置" class="headerlink" title="常见系统、软件日志默认存放位置"></a>常见系统、软件日志默认存放位置</h2><h3 id="Windows日志"><a href="#Windows日志" class="headerlink" title="Windows日志"></a>Windows日志</h3><pre><code>常见事件ID：
+4624  --登录成功   
+4625  --登录失败  
+4634 -- 注销成功
+4647 -- 用户启动的注销   
+4672 -- 使用超级用户（如管理员）进行登录
+4688 -- 进程创建
+4689 -- 进程终止
+4728、4732 -- 安全组管理
+4720、4722、4724、4738 -- 用户账户管理</code></pre>
+<ol>
+<li>Win+X菜单直接选择事件查看器 或者 Win+R打开运行，输入“eventvwr.msc”，回车运行，打开“事件查看器”</li>
+<li>使用mstsc远程登录某个主机时，使用的帐户是管理员帐户的话，成功的情况下会有ID为4776、4648、4624、4672的事件产生</li>
+<li>Win+R打开运行，输入“CMD”，回车运行“ipconfig”，会报事件ID4688、4689产生的日志过程是这个样子：<br> 进程创建 C:\Windows\System32\cmd.exe<br> 进程创建 C:\Windows\System32\ipconfig.exe<br> 进程终止 C:\Windows\System32\ipconfig.exe </li>
+<li>在入侵提权过程中，如果输入<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">net</span> user  USER  PASSWORD /add</span><br><span class="line"><span class="built_in">net</span> localgroup administrators USER /add</span><br></pre></td></tr></table></figure>
+会报4728、4722、4738、4724、4732</li>
+</ol>
+<h3 id="Linux日志"><a href="#Linux日志" class="headerlink" title="Linux日志"></a>Linux日志</h3><p>大部分Linux发行版默认的日志守护进程为 syslog，位于 /etc/syslog 或 /etc/syslogd 或/etc/rsyslog.d，默认配置文件为 /etc/syslog.conf 或 rsyslog.conf，任何希望生成日志的程序都可以向 syslog 发送信息。<br>常用日志文件<br>系统日志是由一个名为syslog的服务管理的，如以下日志文件都是由syslog日志服务驱动的：</p>
+<ul>
+<li>/var/log/boot.log：录了系统在引导过程中发生的事件，就是Linux系统开机自检过程显示的信息</li>
+<li>/var/log/lastlog ：记录最后一次用户成功登陆的时间、登陆IP等信息</li>
+<li>/var/log/messages ：记录Linux操作系统常见的系统和服务错误信息</li>
+<li>/var/log/secure ：Linux系统安全日志，记录用户和工作组变坏情况、用户登陆认证情况</li>
+<li>/var/log/btmp ：记录Linux登陆失败的用户、时间以及远程IP地址</li>
+<li>/var/log/syslog：只记录警告信息，常常是系统出问题的信息，使用lastlog查看</li>
+<li>/var/log/wtmp：该日志文件永久记录每个用户登录、注销及系统的启动、停机的事件，使用last命令查看</li>
+<li>/var/run/utmp：该日志文件记录有关当前登录的每个用户的信息。如 who、w、users、finger等就需要访问这个文件</li>
+</ul>
+<h3 id="中间件日志"><a href="#中间件日志" class="headerlink" title="中间件日志"></a>中间件日志</h3><ul>
+<li>Apache的日志路径一般配置在httpd.conf的目录下或者位于/var/log/http</li>
+<li>IIS的日志默认在系统目录下的Logfiles下的目录当中</li>
+<li>Tomcat 一般位于tomcat安装目录下的一个logs文件夹下面</li>
+<li>Nginx日志一般配置在nginx.conf或者vhost的conf文件中</li>
+</ul>
+<h2 id="推荐日志分析工具"><a href="#推荐日志分析工具" class="headerlink" title="推荐日志分析工具"></a>推荐日志分析工具</h2><ol>
+<li>windows系统的日志分析工具，Log Parser（是微软公司出品的日志分析工具，它功能强大，使用简单，可以分析基于文本的日志文件、XML 文件、CSV（逗号分隔符）文件，以及操作系统的事件日志、注册表、文件系统、Active Directory。它可以像使用 SQL 语句一样查询分析这些数据，甚至可以把分析结果以各种图表的形式展现出来。<br>Log <a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/download/details.aspx?id=24659">Parser 2.2下载</a></li>
+</ol>
+<ol start="2">
+<li>设备日志分析工具，<a target="_blank" rel="noopener" href="https://github.com/JeffXue/web-log-parser">web-log-parse</a></li>
+</ol>
+<ul>
+<li> 将日志文件存放到./data目录下</li>
+<li> 更改配置文件config.ini</li>
+<li> 下载依赖库 pip install -r requirements.txt</li>
+<li> 开始分析 ./bin &amp;&amp; python start.py</li>
+<li> 结果将存储在 ./result/index.html</li>
+</ul>
+<h2 id="社工的艺术"><a href="#社工的艺术" class="headerlink" title="社工的艺术"></a>社工的艺术</h2><p>P.S. 推荐《社工的艺术》，见附件“社工-欺骗的艺术.pdf”</p>
+
+      
+    </div>
+    
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2021/01/21/%E8%AF%B4%E8%B5%B7%E5%90%84%E7%A7%8D%E6%B3%A8%E5%85%A5%E7%9A%84%E5%A7%BF%E5%8A%BF%E8%BF%99%E4%BB%B6%E4%BA%8B/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          说起各种注入的姿势这件事
+        
+      </div>
+    </a>
+  
+  
+    <span id="article-nav-older" class="article-nav-link-wrap older"></span>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+
+</body>
+</html>
